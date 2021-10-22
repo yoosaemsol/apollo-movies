@@ -2,15 +2,9 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { gql, useMutation } from '@apollo/client';
 
-const LIKE_MOVIE = gql`
-  mutation LikeMovie($id: Int!, $isLiked: Boolean!) {
-    likeMovie(id: $id, isLiked: $isLiked) @client
-  }
-`;
-
-const UNLIKE_MOVIE = gql`
-  mutation LikeMovie($id: Int!, $isLiked: Boolean!) {
-    likeMovie(id: $id, isLiked: $isLiked) @client
+const TOGGLE_LIKE_MOVIE = gql`
+  mutation toggleLikeMovie($id: Int!, $isLiked: Boolean!) {
+    toggleLikeMovie(id: $id, isLiked: $isLiked) @client
   }
 `;
 
@@ -54,18 +48,13 @@ const Poster = styled.div`
 `;
 
 const Movie = ({ id, bg, isLiked }) => {
-  const [likeMovie] = useMutation(LIKE_MOVIE, {
-    variables: { id: parseInt(id), isLiked }
-  });
-  const [unlikeMovie] = useMutation(UNLIKE_MOVIE, {
+  const [toggleLikeMovie] = useMutation(TOGGLE_LIKE_MOVIE, {
     variables: { id: parseInt(id), isLiked }
   });
 
   const handleLike = (e) => {
     e.preventDefault();
-
-    !isLiked && likeMovie();
-    isLiked && unlikeMovie();
+    toggleLikeMovie();
   };
 
   return (
