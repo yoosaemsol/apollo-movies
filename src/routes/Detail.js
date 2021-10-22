@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const GET_MOVIE = gql`
   query getMovie($id: Int!) {
@@ -11,13 +12,25 @@ const GET_MOVIE = gql`
       rating
       description_intro
     }
+    suggestions(id: $id) {
+      id
+      medium_cover_image
+    }
   }
 `; // first line is for Apollo and then else for GraphQL
 
-const Container = styled.div`
-  height: 100vh;
+const Page = styled.div`
   background-image: linear-gradient(-45deg, #d754ab, #fd723a);
   width: 100%;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+`;
+
+const Main = styled.div`
+  height: 100vh;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -51,6 +64,33 @@ const Poster = styled.div`
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+`;
+
+const Suggestion = styled.div`
+  width: 100%;
+  padding: 10%;
+  height: fit-content;
+  background-color: #ffffff20;
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    color: white;
+    font-weight: 500;
+    font-size: 30px;
+    margin-bottom: 40px;
+    letter-spacing: 0.05em;
+  }
+
+  div {
+    display: flex;
+  }
+
+  .suggestion-poster {
+    width: 300px;
+    height: 500px;
+    margin-right: 30px;
+  }
 `;
 
 const Loader = styled.div`
@@ -122,28 +162,42 @@ const Detail = () => {
     variables: { id: Number(id) }
   });
 
-  if (loading) {
+  if (loading || !data) {
     return (
-      <Container>
+      <Page>
         <Loader />
-      </Container>
+      </Page>
     );
   }
 
   const { title, language, rating, description_intro, medium_cover_image } =
     data.movie;
 
+  const { suggestions } = data;
+
   return (
-    <Container>
-      <Column>
-        <Title>{title}</Title>
-        <Subtitle>{`${
-          language.charAt(0).toUpperCase() + language.slice(1)
-        } · ${rating}`}</Subtitle>
-        <Description>{description_intro}</Description>
-      </Column>
-      <Poster bg={medium_cover_image}></Poster>
-    </Container>
+    <Page>
+      <Main>
+        <Column>
+          <Title>{title}</Title>
+          <Subtitle>{`${
+            language.charAt(0).toUpperCase() + language.slice(1)
+          } · ${rating}`}</Subtitle>
+          <Description>{description_intro}</Description>
+        </Column>
+        <Poster bg={medium_cover_image} />
+      </Main>
+      <Suggestion>
+        <h3>Suggestions</h3>
+        <div>
+          {suggestions.map((s) => (
+            <Link to={`/${s.id}`}>
+              <Poster className="suggestion-poster" bg={s.medium_cover_image} />
+            </Link>
+          ))}
+        </div>
+      </Suggestion>
+    </Page>
   );
 };
 
