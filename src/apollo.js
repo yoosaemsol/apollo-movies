@@ -15,6 +15,14 @@ const client = new ApolloClient({
             isLiked: (isLiked) => !isLiked
           }
         });
+      },
+      unlikeMovie: (_, { id }, { cache }) => {
+        cache.modify({
+          id: `Movie:${id}`,
+          fields: {
+            isLiked: (isLiked) => !isLiked
+          }
+        });
       }
     }
   }

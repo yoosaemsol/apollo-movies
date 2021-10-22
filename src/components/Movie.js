@@ -8,6 +8,12 @@ const LIKE_MOVIE = gql`
   }
 `;
 
+const UNLIKE_MOVIE = gql`
+  mutation LikeMovie($id: Int!, $isLiked: Boolean!) {
+    likeMovie(id: $id, isLiked: $isLiked) @client
+  }
+`;
+
 const Container = styled.div`
   height: 380px;
   width: 100%;
@@ -51,11 +57,15 @@ const Movie = ({ id, bg, isLiked }) => {
   const [likeMovie] = useMutation(LIKE_MOVIE, {
     variables: { id: parseInt(id), isLiked }
   });
+  const [unlikeMovie] = useMutation(UNLIKE_MOVIE, {
+    variables: { id: parseInt(id), isLiked }
+  });
 
   const handleLike = (e) => {
     e.preventDefault();
 
     !isLiked && likeMovie();
+    isLiked && unlikeMovie();
   };
 
   return (
